@@ -1,30 +1,42 @@
-import { View, Text } from 'react-native'
-import React from 'react'
+import { View, Text, ActivityIndicator } from 'react-native'
+import React, { useContext } from 'react'
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-
-
-import useAuth from './hooks/AuthProvider';
 import LoginScreen from './mer/LoginScreen';
-import Home from './mer/Home';
+import Users from './mer/Users';
 import HomeScreen from './mer/HomeScreen';
+import useAuth from './hooks/useAuth';
 
 
 const Stack = createNativeStackNavigator()
 
 const StackNavigator = () => {
 
-  const {user} =useAuth()
-  
+  const { auth,isLoading,userToken } = useAuth()
 
+
+
+  if (isLoading) {
+    return (<View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <ActivityIndicator size={'large'} />
+    </View>)
+
+  }
 
 
   return (
-    <Stack.Navigator screenOptions={{headerShown:false}}>
-      <Stack.Screen name='Login' component={LoginScreen}/>
-      <Stack.Screen name='HomeScreen' component={HomeScreen}  options={{headerShown:false}} />
-     <Stack.Screen name='Home' component={Home}  options={{headerShown:false}} />
-     
-      
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      {auth.accessToken? <Stack.Group>
+         <Stack.Screen name='HomeScreen' component={HomeScreen} options={{ headerShown: false }} />
+         <Stack.Screen name='Users' component={Users} options={{ headerShown: false }} />
+         </Stack.Group>:
+         <>
+         <Stack.Screen name='Login' component={LoginScreen} /></>
+        
+       }
+        
+
+        
+
     </Stack.Navigator>
   )
 }

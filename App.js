@@ -1,7 +1,8 @@
 import StackNavigator from './StackNavigator';
 import { NavigationContainer } from '@react-navigation/native'
-import { AuthProvider } from './hooks/AuthProvider';
-import { Text, View } from 'react-native';
+import AuthProvider from './context/AuthProvider';
+
+
 
 
 

@@ -1,38 +1,86 @@
 import { View, Text, ImageBackground, TextInput, TouchableOpacity } from 'react-native'
-import React from 'react'
-import { NativeWindStyleSheet } from "nativewind";
+import React, { useContext, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context';
-import {FontAwesome, FontAwesome5 } from '@expo/vector-icons';
+import { FontAwesome, FontAwesome5 } from '@expo/vector-icons';
+import { AuthContext } from '../context/AuthProvider';
+import useAuth from '../hooks/useAuth';
+import axios from '../api/axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+const LOGIN_URL = '/authentication/loginapp';
+
+const LoginScreen = ({ navigation }) => {
+
+  const [username, setUserName] = useState(null)
+  const [password, setPassword] = useState(null)
 
 
-NativeWindStyleSheet.setOutput({
-  default: "native",
-});
+  const { auth, setAuth, setIsLoading } = useAuth()
 
-const LoginScreen = () => {
+  const handlePress = () => {
+    navigation.navigate('Login')
+  }
+
+  const handleSubmit = async () => {
+
+    setIsLoading(true)
+    try {
+      const response = await axios.post(LOGIN_URL,
+        JSON.stringify({ username, password }),
+        {
+          headers: {
+            'Content-Type': 'application/json',
+
+          },
+
+        }
+      );
+
+      //console.log(JSON.stringify(response));
+      const accessToken = response?.data.token.accessToken;
+      const refreshToken = response?.data.token.refreshToken;
+
+      setAuth({ username, password, accessToken, refreshToken });
+
+      if (accessToken) {
+        AsyncStorage.setItem('userToken', accessToken)
+      }
+
+
+
+
+
+    } catch (err) {
+
+      console.log(err);
+
+
+    }
+    setIsLoading(false)
+  }
   return (
     <SafeAreaView className="flex-1  justify-center   bg-white">
-      <View style={{paddingHorizontal:25}}>
-      <View style={{alignItems:'center',marginBottom:60}}>
-        <ImageBackground source={require('../assets/logo.jpg')} style={{width:180,height:100}} />
+      <View style={{ paddingHorizontal: 25 }}>
+        <View style={{ alignItems: 'center', marginBottom: 60 }}>
+          <ImageBackground source={require('../assets/logo.jpg')} style={{ width: 180, height: 100 }} />
         </View>
-      
-      <View style={{flexDirection:'row',borderBottomColor:'#ccc',borderBottomWidth:1,paddingBottom:8,marginBottom:25}}>
-     
-      <FontAwesome5 name="user-alt" size={20} color="black"   style={{marginRight:10}} />
-      <TextInput placeholder='User Name' style={{flex:1,paddingVertical:0}}/>
-      </View>
-      <View style={{flexDirection:'row',borderBottomColor:'#ccc',borderBottomWidth:1,paddingBottom:8,marginBottom:25}}>
-      <FontAwesome name="lock" size={20} color="black" style={{marginRight:10}} />
-      <TextInput placeholder='Password' style={{flex:1,paddingVertical:0}}/>
-      </View>
 
-      <TouchableOpacity onPress={()=>{}} style={{backgroundColor:'#AD40AF',padding:20,borderRadius:10,marginBottom:30}}>
-        <Text style={{color:'#fff',fontWeight:'700',fontSize:16,textAlign:'center'}}>
-LOGIN
-        </Text>
-      </TouchableOpacity>
-      
+        <View style={{ flexDirection: 'row', borderBottomColor: '#ccc', borderBottomWidth: 1, paddingBottom: 8, marginBottom: 25 }}>
+
+          <FontAwesome5 name="user-alt" size={20} color="black" style={{ marginRight: 10 }} />
+          <TextInput placeholder='User Name' style={{ flex: 1, paddingVertical: 0 }} onChangeText={(e) => setUserName(e)} />
+        </View>
+        <View style={{ flexDirection: 'row', borderBottomColor: '#ccc', borderBottomWidth: 1, paddingBottom: 8, marginBottom: 25 }}>
+          <FontAwesome name="lock" size={20} color="black" style={{ marginRight: 10 }} />
+          <TextInput placeholder='Password' style={{ flex: 1, paddingVertical: 0 }} onChangeText={(e) => setPassword(e)} />
+        </View>
+
+        <TouchableOpacity onPress={() => handleSubmit(username, password)} style={{ backgroundColor: '#AD40AF', padding: 20, borderRadius: 10, marginBottom: 30 }}>
+          <Text style={{ color: '#fff', fontWeight: '700', fontSize: 16, textAlign: 'center' }}>
+            LOGIN
+          </Text>
+        </TouchableOpacity>
+
       </View>
     </SafeAreaView>
   )
