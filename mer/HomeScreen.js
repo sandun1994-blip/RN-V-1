@@ -2,10 +2,12 @@ import { Alert, ImageBackground, ScrollView, Text, TouchableOpacity, View } from
 import React, { Component, useContext, useEffect, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { axiosPrivate } from '../config'
-import { AntDesign } from '@expo/vector-icons'
+import { MaterialCommunityIcons,FontAwesome5  } from '@expo/vector-icons';
 import useRefreshToken from '../hooks/useRefreshToken'
 import useAuth from '../hooks/useAuth'
 import useAxiosPrivate from '../hooks/useAxiosPrivate'
+
+import CardComp from '../components/CardComp'
 
 const HomeScreen = ({navigation}) => {
 
@@ -68,25 +70,19 @@ const getUsers = async () => {
   
   return (
     <SafeAreaView style={{ flex: 1, borderStartColor: '#fff' }}>
-      <ScrollView className='p-5'>
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 20 }}>
-          <Text> HELLO :{auth?.username}</Text>
-          <TouchableOpacity onPress={logout} >
-            <ImageBackground source={require('../assets/favicon.png')} style={{ width: 35, height: 35 }} imageStyle={{ borderRadius: 25 }} /></TouchableOpacity>
-        </View>
-        <TouchableOpacity className='bg-pink-400 p-6 w-80 rounded flex-row justify-between'onPress={handlePress}>
-        <Text style={{fontWeight:'bold',fontSize:18,color:'#fff'}}>Let's Begin</Text>
-        <AntDesign name="caretright" size={22} color="white" />
-      </TouchableOpacity>
 
-      <TouchableOpacity className='bg-pink-400 p-6 w-80 rounded flex-row justify-between' >
-        <Text style={{fontWeight:'bold',fontSize:18,color:'#fff'}}>USERS</Text>
+<View style={{ flexDirection: 'row', justifyContent: 'space-between',alignItems:'center', marginTop: 10 }}>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between',alignItems:'center', margin: 10 }}><FontAwesome5 name="user-circle" size={30} color="black" /><Text> HELL{auth?.username}</Text></View>  
+        <View> 
+          <TouchableOpacity onPress={logout} style={{ flexDirection: 'row', justifyContent: 'space-between',alignItems:'center', margin: 10  }} >
+          <MaterialCommunityIcons name="logout-variant" size={30} color="black" />
+            </TouchableOpacity></View>
+         
+        </View>
        
-      </TouchableOpacity>
-      <TouchableOpacity className='bg-pink-400 p-6 w-80 rounded flex-row justify-between m-5' >
-        <Text style={{fontWeight:'bold',fontSize:18,color:'#fff'}}>refresh</Text>
-       
-      </TouchableOpacity>
+      <ScrollView className='p-5'>
+        <View>
+      <CardComp navigation={navigation}/></View>
       </ScrollView>
     </SafeAreaView>
   )

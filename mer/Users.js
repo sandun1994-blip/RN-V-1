@@ -52,14 +52,7 @@ const axiosPrivate =useAxiosPrivate()
 
   return (
     <SafeAreaView className="flex-1 justify-center items-center bg-white"   >
-      <View >
-        <Text className='text-black-600  font-bold ' style={{ fontSize: 30 }} >{users?.username}</Text>
-      </View>
-
-      <TouchableOpacity className='bg-pink-400 p-6 w-80 rounded flex-row justify-between' onPress={handlePress}>
-        <Text style={{ fontWeight: 'bold', fontSize: 18, color: '#fff' }}>Let's Begin</Text>
-        <AntDesign name="caretright" size={22} color="white" />
-      </TouchableOpacity>
+     <Text>yoyo</Text>
 
     </SafeAreaView>
   )
