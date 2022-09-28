@@ -8,6 +8,7 @@ const Scanner = () => {
     const [hasPermission, setHasPermission] = useState(null);
     const [scanned, setScanned] = useState(false);
     const [text, setText] = useState('');
+    const [mainScanerDisplay, setMainScanerDisplay] = useState(true);
 
     const [sound, setSound] = React.useState();
 
@@ -47,6 +48,7 @@ const Scanner = () => {
       setScanned(true);
       setText(data)
       
+      
     };
   
     if (hasPermission === null) {
@@ -57,38 +59,44 @@ const Scanner = () => {
     }
           
   console.log(scanned);
-    return (
-      <View  style={{
+    return (<>
+      { mainScanerDisplay &&<View  style={{
         flexDirection: 'column',
         justifyContent: 'flex-start',
         alignItems:'center',
         
+        
       }} >
         <View style={styles.barcodebox}> 
-            <BarCodeScanner
+          <BarCodeScanner
           onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
           style={{width:500,height:500}}
-        /></View>
-       
+        /></View></View>}
+       <View style={{flexDirection:'row',justifyContent:'space-between',alignItems:'center',marginBottom:5}}>
        <TextInput placeholder='Order Id' style={{ 
     	height: 40, 
-      width:200,
+      width:180,
     	borderColor: 'gray', 
     	borderWidth: 1,
       padding: 10,
      textAlign:'auto',
       marginTop:10,
-      borderRadius:10
+      borderRadius:5,
+      marginLeft:10
     }} onChangeText={(e) => setText(e)} value={text}  /> 
-<TouchableOpacity style={styles.button} onPress={() => {setScanned(false), setText('')}}>
+<TouchableOpacity style={styles.button} onPress={() => {setScanned(false), setText(''),setMainScanerDisplay(true)}}>
       <Text style={styles.text}>Scan</Text>
     </TouchableOpacity>
- <View>
-  <ScrollView style={{ flex: 1 }}>
-    <PurchaseCard text={text}/>
-  </ScrollView>
- </View>
-      </View>
+    
+       </View>
+      
+      
+      <View style={styles.container}>
+        <ScrollView>
+        <PurchaseCard text={text} setMainScanerDisplay={setMainScanerDisplay} mainScanerDisplay={mainScanerDisplay}/>
+        </ScrollView>
+    
+    </View ></>
     );
 }
 
@@ -100,11 +108,12 @@ const styles = StyleSheet.create({
       justifyContent: 'center',
       paddingVertical: 12,
       paddingHorizontal: 32,
-      borderRadius: 10,
+      borderRadius: 5,
       elevation: 3,
       backgroundColor: 'blue',
-      width:200,
-      marginTop:10
+      width:180,
+      marginTop:10,
+      marginRight:10
     },
     text: {
       fontSize: 16,
@@ -120,7 +129,12 @@ const styles = StyleSheet.create({
         width:370,
         overflow:'hidden',
         borderRadius:30,
-        backgroundColor:'red',
+        backgroundColor:'black',
         marginTop:5
+    },
+    container:{
+      paddingTop:4,
+      backgroundColor:'#ddd', 
+
     }
   });
