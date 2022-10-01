@@ -14,6 +14,8 @@ const [userToken,setUserToken] =useState(null)
 const [userRefreshToken,setUserRefreshToken] =useState(null)
 const [userInfo,setUserInfo] =useState(null)
 const [po,setPo] =useState([])
+const [poLine,setPoLine] =useState([])
+const [poInitial,setPoInitial] =useState([])
 
 
 
@@ -77,7 +79,7 @@ useEffect(()=>{
 
     
   return (
-    <AuthContext.Provider value={{auth, setAuth,isLoading,setIsLoading,logout,userToken,setUserToken,po,setPo}}>
+    <AuthContext.Provider value={{auth, setAuth,isLoading,setIsLoading,logout,userToken,setUserToken,po,setPo,poInitial,setPoInitial,poLine,setPoLine}}>
       {children}
     </AuthContext.Provider>
   )

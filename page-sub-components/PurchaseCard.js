@@ -9,7 +9,7 @@ import { BarCodeScanner } from 'expo-barcode-scanner';
 import { Audio } from 'expo-av';
 import useAuth from '../hooks/useAuth'
 const PurchaseCard = ({ text,setMainScanerDisplay,mainScanerDisplay }) => {
-  const { po, setPo } = useAuth()
+  const { po, setPo,poInitial,setPoInitial } = useAuth()
 
  
 
@@ -52,14 +52,15 @@ const PurchaseCard = ({ text,setMainScanerDisplay,mainScanerDisplay }) => {
  
 
 
-  console.log(text);
+ 
   const getPurchaseOrders = async () => {
-    console.log(text);
+   
     setIsLoading(true)
     try {
       const res = await axios.get(`http://192.168.1.200:3000/purchaseorder/search/bycode/?orderid=${text}`, { headers: { 'content-Type': 'application/json' } },)
 
       setPo(res.data)
+      setPoInitial(res.data)
       if (res.data.length>0) {
         setMainScanerDisplay(false)
         
@@ -103,9 +104,9 @@ const PurchaseCard = ({ text,setMainScanerDisplay,mainScanerDisplay }) => {
           style={{width:500,height:500}}
         /></View></View>
     }
-    <View style={{ backgroundColor: 'green',margin:10 }}>
+    <View style={{ backgroundColor: 'green',margin:10,borderRadius:10 }}>
       {
-        po.length > 0 && po.map(((item, i) => <CartCard key={i} item={item} setMainScanerDisplay={setMainScanerDisplay} />))
+        po.length > 0 && po.map(((item, i) => <CartCard key={i} item={item} setMainScanerDisplay={setMainScanerDisplay} textSub={textSub} setTextSub={setTextSub} scanned={scanned} setScanned={setScanned}/>))
       }
      
     </View>

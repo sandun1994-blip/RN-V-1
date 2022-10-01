@@ -3,8 +3,11 @@ import React, { useEffect, useState } from 'react'
 import { BarCodeScanner } from 'expo-barcode-scanner';
 import { Audio } from 'expo-av';
 import PurchaseCard from '../page-sub-components/PurchaseCard';
+import useAuth from '../hooks/useAuth';
 
 const Scanner = () => {
+
+  const {setPo} =useAuth()
     const [hasPermission, setHasPermission] = useState(null);
     const [scanned, setScanned] = useState(false);
     const [text, setText] = useState('');
@@ -47,6 +50,7 @@ const Scanner = () => {
         console.log('ok');
       setScanned(true);
       setText(data)
+     
       
       
     };
@@ -84,7 +88,7 @@ const Scanner = () => {
       borderRadius:5,
       marginLeft:10
     }} onChangeText={(e) => setText(e)} value={text}  /> 
-<TouchableOpacity style={styles.button} onPress={() => {setScanned(false), setText(''),setMainScanerDisplay(true)}}>
+<TouchableOpacity style={styles.button} onPress={() => {setScanned(false), setText(''),setMainScanerDisplay(true), setPo([])}}>
       <Text style={styles.text}>Scan</Text>
     </TouchableOpacity>
     

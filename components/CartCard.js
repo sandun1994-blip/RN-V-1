@@ -3,10 +3,10 @@ import React from 'react'
 import PurchTable from './PurchTable'
 import { getDate } from '../function/func'
 
-const CartCard = ({item,setMainScanerDisplay}) => {
+const CartCard = ({item,setMainScanerDisplay,textSub,setTextSub,scanned,setScanned}) => {
   return (
     <>
-    <PurchTable setMainScanerDisplay={setMainScanerDisplay} id={item.seqNo}/>
+    <PurchTable setMainScanerDisplay={setMainScanerDisplay} id={item.seqNo} textSub={textSub} setTextSub={setTextSub} scanned={scanned} setScanned={setScanned}/>
     <View style={{ ...style.cartCard, backgroundColor: 'red' }}>
 
       <View >
