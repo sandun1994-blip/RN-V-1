@@ -7,6 +7,8 @@ import useAuth from '../hooks/useAuth';
 import axios from 'axios';
 import SelectList from 'react-native-dropdown-select-list'
 import { getBincode, getBincodeWithQty, getSupplyQty } from '../function/func';
+import ModalPoup from './ModalPoup';
+import { AntDesign } from '@expo/vector-icons';
 const PurchTable = ({ setMainScanerDisplay, id, textSub, setTextSub, scanned, setScanned }) => {
 
   const { po, setPo, poInitial, setPoInitial, setPoLine, poLine } = useAuth()
@@ -15,6 +17,19 @@ const PurchTable = ({ setMainScanerDisplay, id, textSub, setTextSub, scanned, se
   const [subPoLine, setSubPoLines] = useState([]);
   const [selected, setSelected] = useState("");
   const [text, setText] = useState("");
+  const [visible, setVisible] = useState(false);
+  const [visibleWarning, setVisibleWarning] = useState(false);
+  
+  const [editedItem, setEditedItem] = useState([]);
+
+  
+  
+  const [dialogBincode, setDialogBincode] = useState(false);
+  const [dialogMgError, setDialogMgError] = useState('');
+
+
+  
+ 
 
   const data = [{ key: '1', value: 'Jammu ' }, { key: '2', value: 'san ' }, { key: '3', value: 'Jammlllllllljjjjjjjjjjjjjkku ' }];
 
@@ -82,9 +97,66 @@ const PurchTable = ({ setMainScanerDisplay, id, textSub, setTextSub, scanned, se
   }, [textSub])
 
 
-  console.log(poLine);
+const handleConfirm = ()=> {
+  let binInfo
+  let condition
 
+  const dataArray = subPoLine.filter((e) => e.selected)
+  const multiSelectArray = []
+  const postArray = []
 
+  dataArray.forEach((item, index) => {
+    if (item.multipleSelect) {
+      item.binCodeArrayWithQty.forEach((element) => {
+        if (Number(element.qty) > 0) {
+          multiSelectArray.push({
+            ...item,
+            binCode: element.binCode,
+            supplyQty: Number(element.qty),
+          })
+        }
+      })
+    } else {
+      multiSelectArray.push(item)
+    }
+  })
+
+  multiSelectArray.forEach((item, index) => {
+    binInfo =
+      item?.stockLocationBinInfo?.length > 0 &&
+      item?.stockLocationBinInfo.find(
+        (element) =>
+          element.binCode === item.binCode &&
+          element.stockCode === item.stockCode &&
+          element.location === item.location
+      )
+
+    if (!(item.binCode && binInfo)) {
+      condition = true
+    } else {
+      postArray.push(item)
+    }
+  })
+  console.log(multiSelectArray);
+
+  if (multiSelectArray.length > 0) {
+    if (!condition) {
+     setVisible(true)
+      setEditedItem(postArray)
+      // this.dialogCode = item.stockItem.stockCode
+    } else {
+      setVisibleWarning(true)
+      setDialogMgError('Select Valid Bincode')
+     
+    }
+  } else {
+
+    setVisibleWarning(true)
+    setDialogMgError('Pick a Value')
+   
+  }
+  console.log( postArray)
+}
 
 
 
@@ -107,7 +179,7 @@ const PurchTable = ({ setMainScanerDisplay, id, textSub, setTextSub, scanned, se
     const newData = subPoLine.map(newItem => {
       if (newItem.stockCode == item.stockCode) {
         return {
-          ...newItem, mselected: !item.mselected
+          ...newItem, multipleSelect: !item.multipleSelect
         }
       }
       return {
@@ -118,6 +190,7 @@ const PurchTable = ({ setMainScanerDisplay, id, textSub, setTextSub, scanned, se
   }
 
   const onChangeValue3 = (item, index) => {
+    console.log(selected);
     const newData = subPoLine.map(newItem => {
       if (newItem.stockCode == item.stockCode) {
         console.log(newItem.binCodeArray);
@@ -173,13 +246,45 @@ const PurchTable = ({ setMainScanerDisplay, id, textSub, setTextSub, scanned, se
   }
 
 
+  const upPickQty =async ()=> {
+    setVisible(false) 
+    const url = 'http://192.168.1.200:3000/salesandpurch'
+    const config = {
+      method: 'post',
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+       
+      },
+      data: {
+        data: editedItem,
+        headers: {
+          'Content-Type': 'application/json',
+         
+        },
+        user: 'loggedInUser',
+      },
+    }
 
+    await axios(config)
+      .then((res) => {
+        console.log(res)
+        // //   await this.upBinQty(this.editedItem)
+        // if (res?.data) {
+        //   this.dialogUpdateMessage = res.data.message
+        //   this.messageUpdateColor = 'error'
+        // } else {
+        //   this.dialogUpdateMessage = ' Update Successfully'
+        //   this.messageUpdateColor = 'success'
+        // }
+      })
+      .catch((err) => {
+        // this.dialogUpdateMessage = err.response.data.message
+        // this.messageUpdateColor = 'error'
 
-  console.log(subPoLine);
-
-
-
-
+        console.log(err);
+      })
+  }
 
 
 
@@ -208,6 +313,53 @@ const PurchTable = ({ setMainScanerDisplay, id, textSub, setTextSub, scanned, se
         {po?.length === 1 && <TouchableOpacity style={styles.buttonTwo} onPress={() => { setScanned(false), setTextSub('') }}>
           <Text style={styles.text}>Scan sub</Text>
         </TouchableOpacity>}
+
+
+
+        <View style={{flex:1,justifyContent:'center',alignContent:'center'}}>
+<ModalPoup visible={visibleWarning}><View style={{flexDirection:'row',justifyContent:'space-around',alignItems:'center'}}>
+
+<TouchableOpacity onPress={()=>setVisibleWarning(false)} style={{flexDirection:'row',justifyContent:'space-around',alignItems:'center'}}>
+  <Text style={{marginRight:10}}>Close</Text>
+  <Text style={{marginRight:10}}>{dialogMgError}</Text>
+</TouchableOpacity>
+</View>
+</ModalPoup>
+  
+
+
+
+</View>
+
+<View style={{flex:1,justifyContent:'center',alignContent:'center'}}>
+<ModalPoup visible={visible}><View style={{flexDirection:'row',justifyContent:'space-around',alignItems:'center'}}>
+<TouchableOpacity onPress={()=>setVisible(false)} style={{flexDirection:'row',justifyContent:'space-around',alignItems:'center'}}>
+  <Text style={{marginRight:10}}>Close</Text>
+<AntDesign name="closecircle" size={24} color="black"  />
+</TouchableOpacity>
+<TouchableOpacity onPress={upPickQty} style={{flexDirection:'row',justifyContent:'space-around',alignItems:'center'}}>
+  <Text style={{marginRight:10}}>upPickQty</Text>
+<AntDesign name="closecircle" size={24} color="black"  />
+</TouchableOpacity>
+<TouchableOpacity onPress={()=>setVisible(false)} style={{flexDirection:'row',justifyContent:'space-around',alignItems:'center'}}>
+  <Text style={{marginRight:10}}>Close</Text>
+<AntDesign name="closecircle" size={24} color="black"  />
+</TouchableOpacity>
+</View>
+</ModalPoup>
+  <Button title='CONFIRM' onPress={handleConfirm}/>
+
+
+
+</View>
+
+
+
+
+
+
+
+
 
 
 
@@ -241,7 +393,7 @@ const PurchTable = ({ setMainScanerDisplay, id, textSub, setTextSub, scanned, se
           }</Text>
 
 
-          {item?.mselected ? <View>{item.binCodeArrayWithQty.map((d, i) => <View key={i} style={{flexDirection: 'row', justifyContent: 'space-around', padding: 14}}>
+          {item?.multipleSelect ? <View>{item.binCodeArrayWithQty.map((d, i) => <View key={i} style={{flexDirection: 'row', justifyContent: 'space-around', padding: 14}}>
             <Text>{d.binCode}</Text>
 
             <TextInput style={{
@@ -261,14 +413,14 @@ const PurchTable = ({ setMainScanerDisplay, id, textSub, setTextSub, scanned, se
             setSelected={setSelected}
             data={item?.binCodeArray} search={false}
             boxStyles={{ height: 50, borderRadius: 10, width: 100, backgroundColor: 'blue', padding: 0 }} //override default styles
-            defaultOption={{ key: '1', value: item?.binCodeArray[0] }}
+            defaultOption={ {key:item?.binCodeArray[0], value:item?.binCodeArray[0]} }
           />}
 
           <Checkbox
             style={styles.checkbox}
-            value={item?.mselected}
+            value={item?.multipleSelect}
             onValueChange={() => onChangeValue2(item, i)}
-            color={item.mselected ? '#4630EB' : undefined}
+            color={item.multipleSelect ? '#4630EB' : undefined}
           />
           <TextInput style={{
             height: 30,
