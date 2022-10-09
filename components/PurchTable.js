@@ -287,6 +287,45 @@ const handleConfirm = ()=> {
   }
 
 
+  const upPickQtyWithTrans =async () =>{
+    
+    const url = process.env.BASE_URL + 'salesandpurch/trans'
+    const config = {
+      method: 'post',
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: this.$auth.strategy.token.get(),
+      },
+      data: {
+        data: this.editedItem,
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: this.$auth.strategy.token.get(),
+        },
+        user: this.loggedInUser.username,
+      },
+    }
+
+    await axios(config)
+      .then((res) => {
+        console.log(res)
+        //   await this.upBinQty(this.editedItem)
+        if (res?.data) {
+          this.dialogUpdateMessage = res.data.message
+          this.messageUpdateColor = 'error'
+        } else {
+          this.dialogUpdateMessage = ' Update Successfully'
+          this.messageUpdateColor = 'success'
+        }
+      })
+      .catch((err) => {
+        this.dialogUpdateMessage = err.response.data.message
+        this.messageUpdateColor = 'error'
+      })
+  }
+
+
 
   return (
     <View>
@@ -341,8 +380,8 @@ const handleConfirm = ()=> {
   <Text style={{marginRight:10}}>upPickQty</Text>
 <AntDesign name="closecircle" size={24} color="black"  />
 </TouchableOpacity>
-<TouchableOpacity onPress={()=>setVisible(false)} style={{flexDirection:'row',justifyContent:'space-around',alignItems:'center'}}>
-  <Text style={{marginRight:10}}>Close</Text>
+<TouchableOpacity onPress={upPickQtyWithTrans} style={{flexDirection:'row',justifyContent:'space-around',alignItems:'center'}}>
+  <Text style={{marginRight:10}}>upPickQtyWithTrans</Text>
 <AntDesign name="closecircle" size={24} color="black"  />
 </TouchableOpacity>
 </View>
